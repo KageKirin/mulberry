@@ -7,9 +7,9 @@ build_type: browser
 development: false
 
 gather:
-    assets: true
     data: true
     page_defs: true
+    assets: true
 
 build:
     javascript:

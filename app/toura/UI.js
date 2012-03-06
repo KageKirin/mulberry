@@ -13,16 +13,18 @@ dojo.declare('toura.UI', dojo.Stateful, {
 
     this._setupFeatureClasses();
     this._setupSiblingNav();
-    this._setupAdTag();
 
     dojo.connect(m.app.UI, 'showPage', this, '_onShowPage');
     this.watch('siblingNavVisible', dojo.hitch(this, '_onSiblingNavVisible'));
   },
 
   _onShowPage : function(page, node) {
-    if (!this.siblingNav) { return; }
-    this.set('siblingNavVisible', true);
-    this.siblingNav.set('node', node);
+    if (this.siblingNav) {
+      this.set('siblingNavVisible', true);
+      this.siblingNav.set('node', node);
+    }
+
+    this._setupAdTag();
   },
 
   _setupFeatureClasses : function() {
@@ -33,18 +35,58 @@ dojo.declare('toura.UI', dojo.Stateful, {
   },
 
   _setupSiblingNav : function() {
-    if (!toura.features.siblingNav) { return; }
-    this.siblingNav = m.app.UI.addPersistentComponent(toura.components.SiblingNav);
+    if (!toura.features.siblingNav || toura.features.ads) { return; }
+
+    this.siblingNav = m.app.UI.addPersistentComponent(toura.components.SiblingNav, {}, 'first');
     this.set('siblingNavVisible', false);
+
+    dojo.connect(this.siblingNav, 'show', this, function() {
+      dojo.addClass(this.body, 'sibling-nav-visible');
+      dojo.publish('/window/resize');
+    });
+
+    dojo.connect(this.siblingNav, 'hide', this, function() {
+      dojo.removeClass(this.body, 'sibling-nav-visible');
+      dojo.publish('/window/resize');
+    });
   },
 
   _setupAdTag : function() {
     if (!toura.features.ads) { return; }
+
+    var isHomeNode = m.app.UI.currentPage && m.app.UI.currentPage.baseObj.isHomeNode,
+        b = dojo.body();
+
+    if (this.adTag) {
+      this.adTag.destroy();
+    }
+
+    if (isHomeNode) {
+      dojo.removeClass(b, 'has-ads');
+      return;
+    }
+
     mulberry.app.PhoneGap.network.isReachable()
-      .then(function(isReachable) {
-        if (!isReachable) { return; }
-        m.app.UI.addPersistentComponent(toura.components.AdTag);
-      });
+      .then(dojo.hitch(this, function(isReachable) {
+        if (!isReachable) {
+          dojo.removeClass(b, 'has-ads');
+          return;
+        }
+
+        var appConfig = mulberry.app.Config.get('app');
+
+        if (appConfig.ads && appConfig.ads[m.Device.type]) {
+          dojo.addClass(b, 'has-ads');
+
+          this.adTag = m.app.UI.addPersistentComponent(
+            toura.components.AdTag,
+            { adConfig : appConfig.ads[m.Device.type] },
+            'last'
+          );
+
+          this.adTag.startup();
+        }
+      }));
   },
 
   _onSiblingNavVisible : function(k, old, visible) {

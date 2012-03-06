@@ -121,17 +121,21 @@ describe Mulberry::App do
 
       [
         'index.html',
-        [ 'media', 'manifest.js' ],
         [ 'css', 'base.css' ],
         [ 'data', 'tour.js' ],
         [ 'data', 'pagedefs.js' ],
         [ 'javascript', 'dojo', 'dojo.js' ],
-        [ 'javascript', 'toura', 'base.js' ],
+        [ 'javascript', 'mulberry', 'base.js' ],
         [ 'javascript', 'toura', 'AppConfig.js' ],
         [ 'javascript', 'client', 'base.js' ]
       ].each do |dir|
         File.exists?(File.join(build_dir, dir)).should be_true
       end
+    end
+
+    it "should disable sharing" do
+      config = File.read(File.join(@app.source_dir, 'builds', 'browser', 'www', 'javascript', 'toura', 'AppConfig.js'))
+      config.should include 'sharing : false'
     end
   end
 

@@ -5,22 +5,21 @@ mulberry._Config = {{{base_config}}};
 
 // force all images to come from S3. this
 // is mainly used by MAP for the preview window.
-mulberry.forceLocal = {{force_local}};
-mulberry.forceStreaming = {{force_streaming}};
+toura.forceLocal = {{force_local}};
+toura.forceStreaming = {{force_streaming}};
 
 // skips checking for newer remote version.
 // useful for speeding up non-data dev.
-mulberry.skipVersionCheck = {{skip_version_check}};
+toura.skipVersionCheck = {{skip_version_check}};
 
 toura.features = {
   siblingNav : {{sibling_nav}},
   ads : {{ads}},
-
-  sharing : true,
-  favorites : true,
-  fontSize : true,
-  multiLineChildNodes : false,
-  debugPage : true
+  sharing : {{sharing}},
+  favorites : {{favorites}},
+  fontSize : {{font_size}},
+  multiLineChildNodes : {{multi_line_child_nodes}},
+  debugPage : {{debug_page}}
 };
 
 mulberry.features = {

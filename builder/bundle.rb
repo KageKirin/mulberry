@@ -28,14 +28,14 @@ module Builder
 
       FileUtils.mkdir_p @www unless File.exists? @www
 
-      position_html unless !@html
-      position_css unless !@css
-      position_js unless !@javascript
-      position_config unless !@config
-      position_data unless !@data
-      position_assets unless !@assets
-      position_page_defs unless !@page_defs
-      position_www_icons unless !@www_icons
+      position_html if @html
+      position_css if @css
+      position_js if @javascript
+      position_config if @config
+      position_data if @data
+      position_assets if @assets && @assets[:dir]
+      position_page_defs if @page_defs
+      position_www_icons if @www_icons
 
       # TODO: separate these. this is dumb, but i copied it
       # directly from build rake for now
@@ -83,8 +83,6 @@ module Builder
     end
 
     def position_assets
-      raise "No directory for assets" unless @assets[:dir]
-
       assets_dir = File.join(@www, 'media')
       FileUtils.mkdir_p(assets_dir) unless File.exists?(assets_dir)
 
@@ -302,15 +300,13 @@ module Builder
 
       js_dir          = File.join(@www, 'javascript')
       mulberry_dir    = File.join(js_dir, 'mulberry')
-      toura_dir       = File.join(js_dir, 'toura')
       dojo_dir        = File.join(js_dir, 'dojo')
-      vendor_dir      = File.join(js_dir, 'vendor')
       nls_dir         = File.join(js_dir, 'mulberry', 'nls')
 
       client_dir      = File.join(js_dir, 'client')
       client_base     = File.join(built, 'client', 'base.js')
 
-      [ js_dir, toura_dir, mulberry_dir, dojo_dir, vendor_dir, nls_dir, client_dir ].each do |d|
+      [ js_dir, mulberry_dir, dojo_dir, nls_dir, client_dir ].each do |d|
         FileUtils.mkdir_p(d) unless File.exists? d
       end
 
@@ -320,21 +316,11 @@ module Builder
       )
 
       FileUtils.cp_r(
-        File.join(built, 'toura', 'base.js'),
-        toura_dir
-      )
-
-      FileUtils.cp_r(
         File.join(built, 'mulberry', 'base.js'),
         mulberry_dir
       )
 
       if @target['development']
-        FileUtils.cp_r(
-          File.join(built, 'toura', 'base.js.uncompressed.js'),
-          toura_dir
-        )
-
         FileUtils.cp_r(
           File.join(built, 'mulberry', 'base.js.uncompressed.js'),
           mulberry_dir
@@ -342,19 +328,7 @@ module Builder
       end
 
       FileUtils.cp_r(
-        File.join(built, 'vendor', 'haml.js'),
-        vendor_dir
-      )
-
-      if @build.build_helper.project_settings[:jquery]
-        FileUtils.cp_r(
-          File.join(built, 'vendor', 'jquery.js'),
-          vendor_dir
-        )
-      end
-
-      FileUtils.cp_r(
-        File.join(built, 'toura', 'nls', '.'),
+        File.join(built, 'mulberry', 'nls', '.'),
         nls_dir
       )
 

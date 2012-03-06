@@ -91,12 +91,50 @@ module Builder
 
       dojo_build
       unminify_haml
+      minify_with_closure
+      concat_vendor_files
 
       if @client_dir
         FileUtils.rm_rf @client_dir
       end
 
       true
+    end
+
+    def minify_with_closure
+      build_location = report[:location]
+      tmp = File.join(build_location, 'tmp.js')
+
+      [
+        [ 'dojo', 'base.js' ],
+        [ 'mulberry', 'base.js' ],
+        [ 'client', 'base.js' ]
+      ].each do |path|
+        file = File.join(build_location, path)
+
+        if File.exists? file
+          %x{java -jar #{File.join(Mulberry::Framework::Directories.root, 'vendor', 'compiler.jar')} --js #{file} --js_output_file #{tmp}}
+          if File.exists? tmp
+            FileUtils.rm_rf file
+            FileUtils.mv tmp, file
+          end
+        end
+
+      end
+    end
+
+    def concat_vendor_files
+      build_location  = report[:location]
+      dojo_dir        = File.join(build_location, 'dojo')
+      vendor_dir      = File.join(build_location, 'vendor')
+
+      File.open(File.join(dojo_dir, 'dojo.js'), 'a') do |dojo_file|
+        dojo_file.write File.read(File.join(vendor_dir, 'haml.js'))
+
+        if @build.build_helper && @build.build_helper.project_settings[:jquery]
+          dojo_file.write File.read(File.join(vendor_dir, 'jquery.js'))
+        end
+      end
     end
 
     def report
@@ -146,7 +184,7 @@ module Builder
         :webkitMobile =>    WEBKIT[@build_type.to_sym],
 
         :action =>          "clean,release",
-        :optimize =>        "shrinksafe",
+        :layerOptimize =>   "comments",
         :localeList =>      "en-us",
 
         :prefixes => [

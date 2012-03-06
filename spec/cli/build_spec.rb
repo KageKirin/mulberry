@@ -13,6 +13,29 @@ describe Builder::Build do
     end
   end
 
+  describe "all builds" do
+    before :all do
+      @b = Builder::Build.new({
+        :build_helper => Mulberry::BuildHelper.new(@app),
+        :device_type => 'phone',
+        :device_os => 'ios',
+        :target => 'device_production'
+      })
+
+      @b.build
+      @bundle = @b.completed_steps[:close][:bundle]
+    end
+
+    it "should minify the javascript files" do
+      base_dir = File.join(@bundle[:location], 'iphone', 'www', 'javascript')
+      mulberry = File.read(File.join(base_dir, 'mulberry', 'base.js'))
+      mulberry.should include 'dojo._hasResource'
+
+      client = File.read(File.join(base_dir, 'client', 'base.js'))
+      client.should include 'dojo._hasResource'
+    end
+  end
+
   describe "iphone build" do
     before :all do
       @b = Builder::Build.new({
@@ -55,10 +78,8 @@ describe Builder::Build do
         [ 'iphone', 'www', 'javascript', 'dojo', 'dojo.js' ],
         [ 'iphone', 'www', 'javascript', 'mulberry', 'base.js' ],
         [ 'iphone', 'www', 'javascript', 'mulberry', 'nls', 'base_en-us.js' ],
-        [ 'iphone', 'www', 'javascript', 'toura', 'base.js' ],
         [ 'iphone', 'www', 'javascript', 'client', 'base.js' ],
-        [ 'iphone', 'www', 'javascript', 'toura', 'AppConfig.js' ],
-        [ 'iphone', 'www', 'javascript', 'vendor', 'haml.js' ]
+        [ 'iphone', 'www', 'javascript', 'toura', 'AppConfig.js' ]
       ].each do |path|
         File.exists?(File.join(@bundle[:location], path)).should be_true
       end
@@ -74,6 +95,11 @@ describe Builder::Build do
       @page_defs.each do |page_def|
         page_defs.should include page_def
       end
+    end
+
+    it "should properly include the data file" do
+      html = File.read(File.join(@bundle[:location], 'iphone', 'www', 'index.html'))
+      html.should include 'tour.js.jet'
     end
 
     after do
@@ -124,10 +150,8 @@ describe Builder::Build do
         [ 'ipad', 'www', 'javascript', 'dojo', 'dojo.js' ],
         [ 'ipad', 'www', 'javascript', 'mulberry', 'base.js' ],
         [ 'ipad', 'www', 'javascript', 'mulberry', 'nls', 'base_en-us.js' ],
-        [ 'ipad', 'www', 'javascript', 'toura', 'base.js' ],
         [ 'ipad', 'www', 'javascript', 'client', 'base.js' ],
-        [ 'ipad', 'www', 'javascript', 'toura', 'AppConfig.js' ],
-        [ 'ipad', 'www', 'javascript', 'vendor', 'haml.js' ]
+        [ 'ipad', 'www', 'javascript', 'toura', 'AppConfig.js' ]
       ].each do |path|
         File.exists?(File.join(@bundle[:location], path)).should be_true
       end
@@ -143,6 +167,11 @@ describe Builder::Build do
       @page_defs.each do |page_def|
         page_defs.should include page_def
       end
+    end
+
+    it "should properly include the data file" do
+      html = File.read(File.join(@bundle[:location], 'ipad', 'www', 'index.html'))
+      html.should include 'tour.js.jet'
     end
 
     after do
@@ -192,10 +221,8 @@ describe Builder::Build do
         [ 'android', 'assets', 'www', 'javascript', 'dojo', 'dojo.js' ],
         [ 'android', 'assets', 'www', 'javascript', 'mulberry', 'base.js' ],
         [ 'android', 'assets', 'www', 'javascript', 'mulberry', 'nls', 'base_en-us.js' ],
-        [ 'android', 'assets', 'www', 'javascript', 'toura', 'base.js' ],
         [ 'android', 'assets', 'www', 'javascript', 'client', 'base.js' ],
-        [ 'android', 'assets', 'www', 'javascript', 'toura', 'AppConfig.js' ],
-        [ 'android', 'assets', 'www', 'javascript', 'vendor', 'haml.js' ]
+        [ 'android', 'assets', 'www', 'javascript', 'toura', 'AppConfig.js' ]
       ].each do |path|
         File.exists?(File.join(@bundle[:location], path)).should be_true
       end
@@ -217,6 +244,11 @@ describe Builder::Build do
       manifest = File.read(File.join(@bundle[:location], 'android', 'AndroidManifest.xml'))
       manifest.should include 'android:versionName="1.0"'
       manifest.should include 'com.toura.app2_fake'
+    end
+
+    it "should properly include the data file" do
+      html = File.read(File.join(@bundle[:location], 'android', 'assets', 'www', 'index.html'))
+      html.should include 'tour.js.jet'
     end
 
     after do

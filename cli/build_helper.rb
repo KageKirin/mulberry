@@ -41,9 +41,11 @@ module Mulberry
 
     def config_settings
       add_ota_to_config_settings({
-        'id' => Mulberry.escape_single_quote(@config['name']),
-        'sibling_nav' => false,
-        'ads' => !!@config['ads']
+        'id'                => Mulberry.escape_single_quote(@config['name']),
+        'sibling_nav'       => false,
+        'ads'               => !!@config['ads'],
+        'sharing'           => !is_browser_build?,
+        'force_streaming'   => is_browser_build?
       })
     end
 
@@ -142,12 +144,6 @@ module Mulberry
       rescue Sass::SyntaxError => err
         puts "SASS ERROR on line #{err.sass_line} of #{err.sass_filename}:\n #{err.to_s}"
       end
-    end
-
-    def html_vars
-      {
-        :include_jquery     => @config['jQuery'] || @config['jquery'],
-      }
     end
 
     def app_id(device_os, device_type)
