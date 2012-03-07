@@ -58,12 +58,12 @@ fi
 
 RVMRUBIES=$(rvm list strings)
 
-if [[ $RVMRUBIES =~ '1.9.3' ]]
+if [[ $RVMRUBIES =~ '1.9.2' ]]
 then
-	echo "Ruby 1.9.3 is installed..."
+	echo "Ruby 1.9.2 is installed..."
 else
-	echo "Installing Ruby 1.9.3 via RVM..."
-	rvm install 1.9.3
+	echo "Installing Ruby 1.9.2 via RVM..."
+	rvm install 1.9.2
 fi
 
 RVMGEMSETS=$(rvm gemset list strings)
@@ -73,11 +73,11 @@ then
 	echo "Mulberry gemset exists..."
 else
 	echo "Creating Mulberry gemset..."
-	rvm use 1.9.3
+	rvm use 1.9.2
 	rvm gemset create 'mulberry'
 fi
 
-rvm use 1.9.3@mulberry
+rvm use 1.9.2@mulberry
 
 
 if [ "$BREWFILE" ]
@@ -130,19 +130,19 @@ else
 	brew install android-sdk
 fi
 
-if [[ $(cat ~/Documents/PhoneGapLib/VERSION ) =~ '1.3.0' ]]
+if [[ $(cat ~/Documents/PhoneGapLib/VERSION ) =~ '1.5.0' ]]
 then
-	echo "PhoneGap 1.3.0 is installed."
+	echo "PhoneGap 1.5.0 is installed."
 else
-	echo "Downloading PhoneGap 1.3.0 to tmp/callback-phonegap-b81151f..."
+	echo "Downloading PhoneGap 1.5.0 to tmp/callback-phonegap-b81151f..."
 
 	cd tmp
-	curl https://nodeload.github.com/callback/phonegap/zipball/1.3.0 --O phonegap.1.3.0.zip
+	curl https://github.com/phonegap/phonegap/zipball/1.5.0 --O phonegap.1.5.0.zip
 
-	unzip -q phonegap.1.3.0.zip
+	unzip -q phonegap.1.5.0.zip
 	cd ..
 
-	hdiutil mount tmp/callback-phonegap-b81151f/iOS/PhoneGap-1.3.0.dmg
+	hdiutil mount tmp/callback-phonegap-b81151f/iOS/PhoneGap-1.5.0.dmg
 
-	open /Volumes/PhoneGap-1.3.0/PhoneGap-1.3.0.pkg
+	open /Volumes/PhoneGap-1.5.0/PhoneGap-1.5.0.pkg
 fi
