@@ -67,7 +67,8 @@ module Mulberry
         :include_dev_config => true,
         :device_type        => params[:type] || 'phone',
         :device_os          => params[:os] || 'ios',
-        :data_filename      => 'data/tour.js'
+        :data_filename      => 'data/tour.js',
+        :title              => @helper.project_settings[:name] || 'Mulberry'
       }
     end
 
@@ -85,7 +86,8 @@ module Mulberry
 
     get '/:os/:type/css/resources/*' do
       send_file File.join(
-        @helper.theme_dir,
+        @source_dir,
+        'app',
         'resources',
         params[:splat].first
       )
@@ -193,7 +195,7 @@ module Mulberry
       content_type 'text/javascript'
       send_file File.join(
         @source_dir,
-        'javascript',
+        'app',
         params[:splat].first
       )
     end

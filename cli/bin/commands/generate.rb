@@ -4,8 +4,7 @@ module Mulberry
   module Command
     class Generate < Mulberry::Command::Base
       def initialize(args = [])
-
-        @dir = Mulberry.get_app_dir args[0]
+        super
         @created_pages = false
 
         sitemap = YAML.load_file(File.join(@dir, Mulberry::SITEMAP))
@@ -45,7 +44,7 @@ module Mulberry
           # assume all non-custom components exist
           true
         else
-          File.exists?(File.join(@dir, 'javascript', 'components', "#{component_basename(component)}.js"))
+          File.exists?(File.join(@dir, 'app', 'components', "#{component_basename(component)}.js"))
         end
       end
 
