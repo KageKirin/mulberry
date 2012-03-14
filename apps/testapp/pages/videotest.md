@@ -1,8 +1,8 @@
 ---
 title: videotest
 page_def:
-  phone: video
-  tablet: video
+  phone: videos-and-text-phone
+  tablet: videos-and-text-tablet
 
 # each of these properties can contain an array of filenames
 images:
